@@ -1,6 +1,8 @@
 import React from 'react';
 
-export default function LandingPage({ onNavigate }: { onNavigate?: () => void }) {
+type ViewState = 'landing' | 'admin' | 'submission' | 'analytics' | 'onboarding' | 'auth' | 'partnership';
+
+export default function LandingPage({ onNavigate }: { onNavigate?: (view: ViewState) => void }) {
   return (
     <div className="bg-deep-blue text-white overflow-x-hidden min-h-screen font-display">
       {/* TopNavBar */}
@@ -57,10 +59,10 @@ export default function LandingPage({ onNavigate }: { onNavigate?: () => void })
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-4 mt-2">
-                      <button onClick={onNavigate} className="flex min-w-[140px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-accent text-[#0f121a] text-base font-bold leading-normal tracking-[0.015em] hover:bg-yellow-300 transition-colors shadow-[0_0_20px_rgba(255,214,1,0.3)]">
+                      <button onClick={() => onNavigate && onNavigate('auth')} className="flex min-w-[140px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-accent text-[#0f121a] text-base font-bold leading-normal tracking-[0.015em] hover:bg-yellow-300 transition-colors shadow-[0_0_20px_rgba(255,214,1,0.3)]">
                         <span className="truncate">Apply Now</span>
                       </button>
-                      <button className="flex min-w-[140px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-white/10 border border-white/10 text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-white/20 transition-colors backdrop-blur-sm">
+                      <button onClick={() => onNavigate && onNavigate('partnership')} className="flex min-w-[140px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-white/10 border border-white/10 text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-white/20 transition-colors backdrop-blur-sm">
                         <span className="truncate">Partner with Us</span>
                       </button>
                     </div>

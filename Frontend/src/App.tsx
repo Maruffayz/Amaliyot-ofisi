@@ -5,8 +5,9 @@ import InternSubmission from './components/InternSubmission';
 import AnalyticsReport from './components/AnalyticsReport';
 import Onboarding from './components/Onboarding';
 import AuthPage from './components/AuthPage';
+import PartnershipForm from './components/PartnershipForm';
 
-type ViewState = 'landing' | 'admin' | 'submission' | 'analytics' | 'onboarding' | 'auth';
+type ViewState = 'landing' | 'admin' | 'submission' | 'analytics' | 'onboarding' | 'auth' | 'partnership';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewState>('landing');
@@ -44,12 +45,13 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen">
-      {currentView === 'landing' && <LandingPage onNavigate={() => navigate('auth')} />}
+      {currentView === 'landing' && <LandingPage onNavigate={navigate} />}
       {currentView === 'admin' && <AdminDashboard onNavigate={navigate} />}
       {currentView === 'submission' && <InternSubmission onNavigate={navigate} />}
       {currentView === 'analytics' && <AnalyticsReport onNavigate={navigate} />}
       {currentView === 'onboarding' && <Onboarding onNavigate={navigate} />}
       {currentView === 'auth' && <AuthPage onLogin={() => navigate('admin')} onNavigate={navigate} />}
+      {currentView === 'partnership' && <PartnershipForm onNavigate={navigate} />}
     </div>
   );
 }
