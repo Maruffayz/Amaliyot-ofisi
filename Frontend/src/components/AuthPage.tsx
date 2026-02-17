@@ -98,10 +98,8 @@ export default function AuthPage({ onLogin, onNavigate }: { onLogin: () => void;
         setPassword('');
         setUsername('');
         setFullName('');
-        setTimeout(() => {
-          setIsLogin(true);
-          setSuccess(null);
-        }, 2000);
+        // Automatically sign in after successful registration
+        setTimeout(() => onLogin(), 1500);
       }
     } catch (err: any) {
       setError(err.message || (isLogin ? 'Login failed' : 'Registration failed'));

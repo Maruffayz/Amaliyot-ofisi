@@ -16,16 +16,20 @@ export async function registerUser(email: string, username: string, password: st
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || "Registration failed");
+      try {
+        const error = await response.json();
+        throw new Error(error.detail || "Registration failed");
+      } catch (parseError: any) {
+        throw new Error(`Registration failed: ${response.status} ${response.statusText}`);
+      }
     }
 
     const data = await response.json();
     localStorage.setItem("access_token", data.access_token);
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Registration error:", error);
-    throw error;
+    throw new Error(error.message || "Failed to connect to server. Please make sure the backend is running.");
   }
 }
 
@@ -38,16 +42,20 @@ export async function loginUser(email: string, password: string) {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || "Login failed");
+      try {
+        const error = await response.json();
+        throw new Error(error.detail || "Login failed");
+      } catch (parseError: any) {
+        throw new Error(`Login failed: ${response.status} ${response.statusText}`);
+      }
     }
 
     const data = await response.json();
     localStorage.setItem("access_token", data.access_token);
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Login error:", error);
-    throw error;
+    throw new Error(error.message || "Failed to connect to server. Please make sure the backend is running.");
   }
 }
 

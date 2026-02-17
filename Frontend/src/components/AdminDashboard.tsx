@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { getInterns, getVolunteers, getSupervisors, getMentors, logout } from '../services/api';
+import React, { useState } from 'react';
 
-type ViewState = 'landing' | 'admin' | 'submission' | 'analytics' | 'onboarding' | 'auth';
-
-// Mock Data - fallback when API is not available
-const mockInternsData = [
+// Mock Data
+const internsData = [
   { id: 1, name: "Alice Johnson", role: "Frontend Dev", supervisor: "Sarah Jenkins", status: "Active", progress: 75, avatar: "https://i.pravatar.cc/150?u=20" },
   { id: 2, name: "Bob Smith", role: "Backend Dev", supervisor: "David Chen", status: "Reviewing", progress: 90, avatar: "https://i.pravatar.cc/150?u=21" },
   { id: 3, name: "Charlie Brown", role: "Marketing", supervisor: "James Wilson", status: "Pending", progress: 0, avatar: "https://i.pravatar.cc/150?u=22" },
@@ -31,47 +28,8 @@ const mentorsData = [
   { id: 2, name: "Prof. Alan Turing", role: "Researcher", dept: "AI & ML", mentees: 10, avatar: "https://i.pravatar.cc/150?u=30" },
 ];
 
-export default function AdminDashboard({ onNavigate }: { onNavigate?: (view: ViewState) => void }) {
+export default function AdminDashboard() {
   const [activeView, setActiveView] = useState('internships');
-  const [interns, setInterns] = useState<any[]>([]);
-  const [volunteers, setVolunteers] = useState<any[]>([]);
-  const [supervisors, setSupervisors] = useState<any[]>([]);
-  const [mentors, setMentors] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Fetch data on component mount
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const [internsData, volunteersData, supervisorsData, mentorsData] = await Promise.all([
-          getInterns().catch(() => mockInternsData),
-          getVolunteers ? getVolunteers().catch(() => volunteersData) : Promise.resolve(volunteersData),
-          getSupervisors ? getSupervisors().catch(() => supervisorsData) : Promise.resolve(supervisorsData),
-          getMentors ? getMentors().catch(() => mentorsData) : Promise.resolve(mentorsData),
-        ]);
-        
-        setInterns(Array.isArray(internsData) ? internsData : mockInternsData);
-        setVolunteers(Array.isArray(volunteersData) ? volunteersData : volunteersData);
-        setSupervisors(Array.isArray(supervisorsData) ? supervisorsData : supervisorsData);
-        setMentors(Array.isArray(mentorsData) ? mentorsData : mentorsData);
-      } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Could not load data from server');
-        // Use mock data as fallback
-        setInterns(mockInternsData);
-        setVolunteers(volunteersData);
-        setSupervisors(supervisorsData);
-        setMentors(mentorsData);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   // Removed Interns and Ambassadors from menu
   const menuItems = [
@@ -81,13 +39,6 @@ export default function AdminDashboard({ onNavigate }: { onNavigate?: (view: Vie
     { id: 'supervisors', label: 'Supervisors', icon: 'supervisor_account' },
     { id: 'mentors', label: 'Mentors', icon: 'diversity_3' },
   ];
-
-  const handleLogout = () => {
-    logout();
-    if (onNavigate) {
-      onNavigate('auth');
-    }
-  };
 
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white h-screen overflow-hidden flex selection:bg-primary/20">
@@ -123,21 +74,12 @@ export default function AdminDashboard({ onNavigate }: { onNavigate?: (view: Vie
           </nav>
         </div>
         <div className="mt-auto p-6 border-t border-slate-200 dark:border-slate-800">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              <div className="size-10 rounded-full bg-cover bg-center border border-slate-200 dark:border-slate-700" style={{backgroundImage: "url('https://i.pravatar.cc/150?u=4')"}}></div>
-              <div className="flex flex-col overflow-hidden">
-                <p className="text-sm font-bold truncate text-slate-900 dark:text-white">Alex Morgan</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">alex.m@admin.org</p>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-full bg-cover bg-center border border-slate-200 dark:border-slate-700" style={{backgroundImage: "url('https://i.pravatar.cc/150?u=4')"}}></div>
+            <div className="flex flex-col overflow-hidden">
+              <p className="text-sm font-bold truncate text-slate-900 dark:text-white">Alex Morgan</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">alex.m@admin.org</p>
             </div>
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 transition-colors text-sm font-medium"
-            >
-              <span className="material-symbols-outlined text-[18px]">logout</span>
-              <span>Logout</span>
-            </button>
           </div>
         </div>
       </aside>
@@ -146,34 +88,12 @@ export default function AdminDashboard({ onNavigate }: { onNavigate?: (view: Vie
       <main className="flex-1 overflow-y-auto h-full relative">
         <div className="container mx-auto max-w-7xl p-4 sm:p-6 lg:p-8 flex flex-col gap-8 pb-24">
           
-          {/* Loading State */}
-          {loading && (
-            <div className="flex items-center justify-center py-20">
-              <div className="text-center">
-                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-slate-500 dark:text-slate-400">Loading data...</p>
-              </div>
-            </div>
-          )}
-
-          {/* Error State */}
-          {error && !loading && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 rounded-xl flex items-center gap-3">
-              <span className="material-symbols-outlined text-red-500">error</span>
-              <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>
-            </div>
-          )}
-
           {/* Dynamic Content Rendering */}
-          {!loading && (
-            <>
-              {activeView === 'internships' && <InternshipsView interns={interns} />}
-              {activeView === 'dashboard' && <DashboardView interns={interns} />}
-              {activeView === 'participants' && <ParticipantsView interns={interns} volunteers={volunteers} />}
-              {activeView === 'supervisors' && <SupervisorsView supervisors={supervisors} />}
-              {activeView === 'mentors' && <MentorsView mentors={mentors} />}
-            </>
-          )}
+          {activeView === 'internships' && <InternshipsView />}
+          {activeView === 'dashboard' && <DashboardView />}
+          {activeView === 'participants' && <ParticipantsView />}
+          {activeView === 'supervisors' && <SupervisorsView />}
+          {activeView === 'mentors' && <MentorsView />}
 
         </div>
       </main>
@@ -183,7 +103,7 @@ export default function AdminDashboard({ onNavigate }: { onNavigate?: (view: Vie
 
 // --- SUB-COMPONENTS for Views ---
 
-function DashboardView({ interns = [] }: { interns: any[] }) {
+function DashboardView() {
     return (
         <div className="flex flex-col gap-8 animate-in fade-in duration-500">
             {/* Header */}
@@ -357,14 +277,14 @@ function DashboardView({ interns = [] }: { interns: any[] }) {
     )
 }
 
-function ParticipantsView({ interns = [], volunteers = [] }: { interns: any[]; volunteers: any[] }) {
+function ParticipantsView() {
     const [filter, setFilter] = useState('all'); // all, intern, volunteer
     const [selectedProfile, setSelectedProfile] = useState<any>(null);
 
     // Combine data with type tag
     const allParticipants = [
-        ...interns.map(i => ({...i, type: 'Intern'})),
-        ...volunteers.map(v => ({...v, type: 'Volunteer', supervisor: v.project, progress: v.hours > 100 ? 100 : v.hours }))
+        ...internsData.map(i => ({...i, type: 'Intern'})),
+        ...volunteersData.map(v => ({...v, type: 'Volunteer', supervisor: v.project, progress: v.hours > 100 ? 100 : v.hours }))
     ];
 
     const displayed = filter === 'all' ? allParticipants : allParticipants.filter(p => p.type.toLowerCase() === filter);
@@ -613,7 +533,7 @@ function ParticipantsView({ interns = [], volunteers = [] }: { interns: any[]; v
     );
 }
 
-function InternshipsView({ interns = [] }: { interns: any[] }) {
+function InternshipsView() {
   return (
     <>
       {/* Page Heading */}
@@ -735,7 +655,7 @@ function InternshipsView({ interns = [] }: { interns: any[] }) {
   );
 }
 
-function SupervisorsView({ supervisors = [] }: { supervisors: any[] }) {
+function SupervisorsView() {
     return (
         <div className="flex flex-col gap-6">
              <div className="flex flex-col gap-1">
@@ -743,7 +663,7 @@ function SupervisorsView({ supervisors = [] }: { supervisors: any[] }) {
                 <p className="text-slate-500 dark:text-slate-400 text-base">Faculty and team leads managing internships.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {supervisors.map((sup) => (
+                {supervisorsData.map((sup) => (
                     <div key={sup.id} className="bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-xl p-6 flex flex-col items-center text-center gap-4 hover:border-primary/50 transition-colors group">
                          <div className="size-20 rounded-full bg-cover bg-center ring-4 ring-slate-50 dark:ring-slate-800 group-hover:ring-primary/20 transition-all" style={{backgroundImage: `url('${sup.avatar}')`}}></div>
                          <div>
@@ -769,7 +689,7 @@ function SupervisorsView({ supervisors = [] }: { supervisors: any[] }) {
     )
 }
 
-function MentorsView({ mentors = [] }: { mentors: any[] }) {
+function MentorsView() {
      return (
         <div className="flex flex-col gap-6">
              <div className="flex flex-col gap-1">
@@ -777,7 +697,7 @@ function MentorsView({ mentors = [] }: { mentors: any[] }) {
                 <p className="text-slate-500 dark:text-slate-400 text-base">Industry experts guiding the next generation.</p>
             </div>
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mentors.map((mentor) => (
+                {mentorsData.map((mentor) => (
                     <div key={mentor.id} className="flex gap-4 p-4 bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-xl hover:shadow-md transition-shadow">
                         <div className="size-16 rounded-xl bg-cover bg-center shrink-0" style={{backgroundImage: `url('${mentor.avatar}')`}}></div>
                         <div className="flex flex-col flex-1">
