@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // Mock Data
 const internsData = [
@@ -29,7 +29,19 @@ const mentorsData = [
 ];
 
 export default function AdminDashboard() {
-  const [activeView, setActiveView] = useState('internships');
+    const [activeView, setActiveView] = useState('internships');
+    const [currentUser, setCurrentUser] = useState<any | null>(null);
+
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem('current_user');
+            if (stored) {
+                setCurrentUser(JSON.parse(stored));
+            }
+        } catch (e) {
+            console.error('Failed to load current_user from localStorage', e);
+        }
+    }, []);
 
   // Removed Interns and Ambassadors from menu
   const menuItems = [
@@ -73,15 +85,19 @@ export default function AdminDashboard() {
             ))}
           </nav>
         </div>
-        <div className="mt-auto p-6 border-t border-slate-200 dark:border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-full bg-cover bg-center border border-slate-200 dark:border-slate-700" style={{backgroundImage: "url('https://i.pravatar.cc/150?u=4')"}}></div>
-            <div className="flex flex-col overflow-hidden">
-              <p className="text-sm font-bold truncate text-slate-900 dark:text-white">Alex Morgan</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">alex.m@admin.org</p>
-            </div>
-          </div>
-        </div>
+                <div className="mt-auto p-6 border-t border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-3">
+                        <div className="size-10 rounded-full bg-cover bg-center border border-slate-200 dark:border-slate-700" style={{backgroundImage: "url('https://i.pravatar.cc/150?u=4')"}}></div>
+                        <div className="flex flex-col overflow-hidden">
+                            <p className="text-sm font-bold truncate text-slate-900 dark:text-white">
+                                {currentUser?.full_name || currentUser?.username || 'Admin User'}
+                            </p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                                {currentUser?.email || 'admin@example.org'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
       </aside>
 
       {/* Main Content Area */}

@@ -3,7 +3,7 @@
  * This file handles all HTTP requests to the FastAPI backend
  */
 
-const API_BASE_URL = "http://localhost:8000/api/v1";
+const API_BASE_URL = "http://localhost:8010/api/v1";
 
 // ============== Auth Requests ==============
 
@@ -16,16 +16,27 @@ export async function registerUser(email: string, username: string, password: st
     });
 
     if (!response.ok) {
+      let message = "Registration failed";
       try {
         const error = await response.json();
-        throw new Error(error.detail || "Registration failed");
-      } catch (parseError: any) {
-        throw new Error(`Registration failed: ${response.status} ${response.statusText}`);
+        if (error && typeof error.detail === "string") {
+          message = error.detail;
+        }
+      } catch {
+        if (response.status === 400) {
+          message = "Email or username already registered. Please log in instead.";
+        } else {
+          message = `Registration failed: ${response.status} ${response.statusText}`;
+        }
       }
+      throw new Error(message);
     }
 
     const data = await response.json();
     localStorage.setItem("access_token", data.access_token);
+    if (data.user) {
+      localStorage.setItem("current_user", JSON.stringify(data.user));
+    }
     return data;
   } catch (error: any) {
     console.error("Registration error:", error);
@@ -42,16 +53,27 @@ export async function loginUser(email: string, password: string) {
     });
 
     if (!response.ok) {
+      let message = "Login failed";
       try {
         const error = await response.json();
-        throw new Error(error.detail || "Login failed");
-      } catch (parseError: any) {
-        throw new Error(`Login failed: ${response.status} ${response.statusText}`);
+        if (error && typeof error.detail === "string") {
+          message = error.detail;
+        }
+      } catch {
+        if (response.status === 401) {
+          message = "Invalid email or password";
+        } else {
+          message = `Login failed: ${response.status} ${response.statusText}`;
+        }
       }
+      throw new Error(message);
     }
 
     const data = await response.json();
     localStorage.setItem("access_token", data.access_token);
+    if (data.user) {
+      localStorage.setItem("current_user", JSON.stringify(data.user));
+    }
     return data;
   } catch (error: any) {
     console.error("Login error:", error);

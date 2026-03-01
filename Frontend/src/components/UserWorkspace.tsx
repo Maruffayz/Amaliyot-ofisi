@@ -1,10 +1,22 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 type TabType = 'overview' | 'cv' | 'reports';
 
 export default function UserWorkspace() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [currentUser, setCurrentUser] = useState<any | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('current_user');
+      if (stored) {
+        setCurrentUser(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error('Failed to load current_user from localStorage', e);
+    }
+  }, []);
   
   // Mock Data for Progress Visualization
   const userStats = {
@@ -27,8 +39,12 @@ export default function UserWorkspace() {
           <div className="flex items-center gap-6">
             <div className="size-20 rounded-2xl bg-cover bg-center border-4 border-white/20 shadow-xl" style={{backgroundImage: "url('https://i.pravatar.cc/150?u=9')"}}></div>
             <div>
-              <h1 className="text-3xl font-black tracking-tight">Jane Doe</h1>
-              <p className="text-blue-100 opacity-80 font-medium">Software Engineering Intern • Amaliyotchilar Hub</p>
+              <h1 className="text-3xl font-black tracking-tight">
+                {currentUser?.full_name || currentUser?.username || 'Intern User'}
+              </h1>
+              <p className="text-blue-100 opacity-80 font-medium">
+                {currentUser?.email || 'Software Engineering Intern • Amaliyotchilar Hub'}
+              </p>
             </div>
           </div>
           <div className="flex gap-2 bg-white/10 backdrop-blur-md p-1 rounded-xl border border-white/10">

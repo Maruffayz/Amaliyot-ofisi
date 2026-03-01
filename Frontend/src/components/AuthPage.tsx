@@ -31,7 +31,7 @@ export default function AuthPage({ onLogin, onNavigate }: { onLogin: () => void;
     setError(null);
 
     try {
-      const backendResponse = await fetch(`http://localhost:8000/api/v1/auth/${provider}`, {
+      const backendResponse = await fetch(`http://localhost:8010/api/v1/auth/${provider}`, {
         method: "POST",
         headers: {
           'Content-Type': "application/json",
@@ -44,8 +44,11 @@ export default function AuthPage({ onLogin, onNavigate }: { onLogin: () => void;
 
       if (backendResponse.ok) {
         const userData = await backendResponse.json();
-        // Store the token
+        // Store the token and user profile
         localStorage.setItem('access_token', userData.access_token);
+        if (userData.user) {
+          localStorage.setItem('current_user', JSON.stringify(userData.user));
+        }
         setSuccess(`Welcome, ${userData.user.username}!`);
         setShowOAuthEmailModal(null);
         setOauthEmail('');
