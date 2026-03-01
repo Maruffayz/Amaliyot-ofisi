@@ -23,7 +23,7 @@ export default function LandingPage({ onNavigate }: { onNavigate?: (view: ViewSt
             </div>
             <div className="flex gap-3">
               <button 
-                onClick={onNavigate}
+                onClick={() => onNavigate && onNavigate('auth')}
                 className="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-6 bg-transparent border border-white/20 hover:border-accent hover:text-accent text-white text-sm font-bold leading-normal tracking-[0.015em] transition-all"
               >
                 <span className="truncate">Login</span>
@@ -195,7 +195,10 @@ export default function LandingPage({ onNavigate }: { onNavigate?: (view: ViewSt
                       </p>
                     </div>
                     <div className="flex justify-center z-10 w-full">
-                      <button onClick={onNavigate} className="flex w-full max-w-[200px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-8 bg-accent text-[#0f121a] text-lg font-bold leading-normal tracking-[0.015em] hover:bg-yellow-300 hover:scale-105 transition-all shadow-lg">
+                      <button
+                        onClick={() => onNavigate && onNavigate('auth')}
+                        className="flex w-full max-w-[200px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-8 bg-accent text-[#0f121a] text-lg font-bold leading-normal tracking-[0.015em] hover:bg-yellow-300 hover:scale-105 transition-all shadow-lg"
+                      >
                         <span className="truncate">Apply Now</span>
                       </button>
                     </div>
